@@ -23,7 +23,7 @@
 #define NB_ELEM_LIGNE	5
 #define NB_LIGNE		3
 
-//#define PERFORMANCE
+#define PERFORMANCE
 
 
 // ---------------- Structures ---------------- 

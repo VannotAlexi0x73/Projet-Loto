@@ -6,7 +6,7 @@
 // Auteur		: VANNOT Alexis										//
 //////////////////////////////////////////////////////////////////////
 
-// #include "loto.h"
+ #include "loto.h"
 
 
 /*
@@ -15,63 +15,57 @@
  *	Elle permet de cr�er toutes les donn�es n�cessaires
  *	au fonctionnement du jeu gr�ce au fichier DESCAR.txt
  *
- *  loto :	pointeur sur un �l�ment loto cr�� dans le main()
- *			de fa�on � modifier son contenu
+ *  loto	: pointeur sur un �l�ment loto cr�� dans le main()
+ *			  de fa�on � modifier son contenu
  *
- *  return : void
+ *  return	: void
  */
 void createLoto(ST_Loto* loto) {
 
 	// ---------------- Variables ---------------- 
 
 	FILE* file = fopen("DESCAR.txt", "r");
-	int index = 0;
 	int tabLigneFichier[16];
+	ST_Carton* pCartons;
 	iNbCartons = 0;
-	ST_Carton* pInitial = loto->TbCartons;
+
 
 	// ---------------- Lecture du fichier ---------------- 
 	if (file != NULL) {
 		while (lectureLigneFichier(file, tabLigneFichier) != EOF)
 		{
-			
-			
-			loto->TbCartons = realloc(pInitial, sizeof(ST_Carton) * iNbCartons);
+			iNbCartons++;
+			pCartons = realloc(loto->TbCartons, sizeof(ST_Carton) * iNbCartons);
 
-			loto->TbCartons[index].NumeroCarton = tabLigneFichier[0];
+			// Sécurité en cas de soucis allocation dynamique
+			if (pCartons != NULL)
+			{
+				loto->TbCartons = pCartons;
+			}
+			else
+			{
+				supprimerVariableDynamique(loto);
+
+				printf("Erreur lors de la re-allocation mémoire !!!!\n");
+				exit(EXIT_FAILURE);
+			}
+			
+			loto->TbCartons[iNbCartons - 1].NumeroCarton = tabLigneFichier[0];
 
 			for (int i = 0; i < NB_LIGNE; i++)
 			{
 				for (int k = 0; k < NB_CASE; k++)
 				{
-					loto->TbCartons[index].TbLigne[i].TbCase[k] = 0;
+					loto->TbCartons[iNbCartons - 1].TbLigne[i].TbCase[k] = 0;
 				}
 				for (int j = (NB_ELEM_LIGNE * i) + 1; j < (NB_ELEM_LIGNE * (i + 1)) + 1 ; j++)
 				{
 
-					loto->TbCartons[index].TbLigne[i].TbCase[tabLigneFichier[j] / 10] = tabLigneFichier[j];
-					printf("loto->TbCartons[index].TbLigne[i].TbCase[tabLigneFichier[j] / 10] : %d\n", loto->TbCartons[index].TbLigne[i].TbCase[tabLigneFichier[j] / 10]);
+					loto->TbCartons[iNbCartons - 1].TbLigne[i].TbCase[tabLigneFichier[j] / 10] = tabLigneFichier[j];
 				}
-				loto->TbCartons[index].TbLigne[i].Marqueur = 0;
+				loto->TbCartons[iNbCartons - 1].TbLigne[i].Marqueur = 0;
 			}
-			printf("iNbCartons : %d\n", iNbCartons);
-			printf("index : %d\n", index);
-			iNbCartons++;
-			index++;
 		}
-
-		printf("loto->TbCartons : %p\n", &loto->TbCartons);
-		printf("pInitial : %p\n", &pInitial);
-
-
-		// loto->TbCartons = pInitial;
-
-
-		printf("iNbCartons : %d\n", iNbCartons);
-		printf("1 : %d\n", loto->TbCartons[0].TbLigne[0].TbCase[0]);
-		printf("1 : %d\n", loto->TbCartons[0].TbLigne[0].TbCase[1]);
-		printf("1 : %d\n", loto->TbCartons[0].TbLigne[0].TbCase[2]);
-		printf("1 : %d\n", loto->TbCartons[0].TbLigne[0].TbCase[3]);
 
 		for (int i = 0; i < 90; i++)
 		{
@@ -97,10 +91,10 @@ void createLoto(ST_Loto* loto) {
  *	Permet de r�cup�rer les donn�es en ligne dans le fichier sous le
  *	format "nCarton;x;x;x;x;x;x;x;x;x;x;x;x;x;x;x"
  *
- *  file :	pointeur sur le fichier dans lequel on va lire les valeurs
- *	tab : tableau pour stocker les donn�es lues dans le fichier
+ *  file	: pointeur sur le fichier dans lequel on va lire les valeurs
+ *	tab		: tableau pour stocker les donn�es lues dans le fichier
  *
- *  return : valeur de retour de la m�thode fscanf(arg1, arg2)
+ *  return	: valeur de retour de la m�thode fscanf(arg1, arg2)
  */
 int lectureLigneFichier(FILE* file, int tab[]) {
 	return fscanf(
@@ -118,10 +112,10 @@ int lectureLigneFichier(FILE* file, int tab[]) {
  *	----------------------------
  *	Fonction qui permet � l'utilisateur de renseigner les num�ros qui ont �t� cri�s
  *
- *  loto :	pointeur sur le jeu loto cr�� pr�c�dement afin de pouvoir
- *			le transmettre au moteur de jeu pour en modifier son contenu
+ *  loto	: pointeur sur le jeu loto cr�� pr�c�dement afin de pouvoir
+ *			  le transmettre au moteur de jeu pour en modifier son contenu
  *
- *  return : void
+ *  return	: void
  */
 void jouerLoto(ST_Loto* loto)
 {
@@ -138,7 +132,7 @@ void jouerLoto(ST_Loto* loto)
 		do
 		{
 			printf("Veuillez saisir un nombre du loto (entre 1 et 90 ou -1 pour arreter) : ");
-			scanf("%d", &iNum);
+			scanf_s("%d", &iNum);
 
 			if (iNum == -1) bAgain = false;
 
@@ -159,6 +153,9 @@ void jouerLoto(ST_Loto* loto)
 		printf("\n\t==> Vous avez decide d'arreter le loto avant sa fin.\n");
 	}
 
+	// Libération de l'espace mémoire allouée dynamiquement
+	supprimerVariableDynamique(loto);
+
 }
 
 /*
@@ -171,11 +168,11 @@ void jouerLoto(ST_Loto* loto)
  *	Lorsque une �tape est valid�e, la prochaine it�ration dans cette
  *	fonction serra l'�tape suivante gr�ce au pointeur iStep
  *
- *  loto :	pointeur sur le jeu loto cr�� pr�c�dement
- *	iNum : num�ro qui vient d'�tre cri�
- *	iStep : pointeur sur l'�tape de jeu du loto afin de modifier l'�tape
+ *  loto	: pointeur sur le jeu loto cr�� pr�c�dement
+ *	iNum	: num�ro qui vient d'�tre cri�
+ *	iStep	: pointeur sur l'�tape de jeu du loto afin de modifier l'�tape
  *
- *  return : true si au moins un carton est gagnant sinon false
+ *  return	: true si au moins un carton est gagnant sinon false
  */
 bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 {
@@ -184,13 +181,14 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 	int nbCountLigneGagnante = 0;
 	int iSommeMarqueur = 0;
 	int iCase = 0;
-	int iIndexGagnant = 0;
+	int iTmp = 0;
+	int* pGagnants;
 	clock_t cDebut = clock();
 
 	// ---------------- Boucles de jeu ----------------
 	loto->TbNumeros[iNum].bCrie = true;
 
-	for (int i = 0; i < 1260; i++)
+	for (int i = 0; i < iNbCartons; i++)
 	{
 		iSommeMarqueur = 0;
 		for (int j = 0; j < NB_LIGNE; j++)
@@ -212,7 +210,23 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 		if (iSommeMarqueur == (5 * (*iStep)))
 		{
 			nbCountLigneGagnante++;
-			loto->TbCartonsGagnants[iIndexGagnant++] = loto->TbCartons[i].NumeroCarton - 1;
+
+			pGagnants = realloc(loto->TbCartonsGagnants, sizeof(int) * nbCountLigneGagnante);
+
+			// Sécurité en cas de soucis allocation dynamique
+			if (pGagnants != NULL)
+			{
+				loto->TbCartonsGagnants = pGagnants;
+			}
+			else
+			{
+				supprimerVariableDynamique(loto);
+
+				printf("Erreur lors de la re-allocation mémoire !!!!\n");
+				exit(EXIT_FAILURE);
+			}
+
+			loto->TbCartonsGagnants[nbCountLigneGagnante - 1] = loto->TbCartons[i].NumeroCarton - 1;
 		}
 	}
 
@@ -229,8 +243,8 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 		printf("\tLe(s) carton(s) gagnant(s) est/sont :\n");
 		for (int i = 0; i < nbCountLigneGagnante; i++)
 		{
-			iIndexGagnant = loto->TbCartonsGagnants[i];
-			affichageCarton(loto->TbCartons[iIndexGagnant]);
+			iTmp = loto->TbCartonsGagnants[i];
+			affichageCarton(loto->TbCartons[iTmp]);
 		}
 
 		// On incr�mente l'�tape du loto pour passer � plusieurs lignes gagnantes
@@ -266,7 +280,7 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
  *      |   | XX |    |    |    | XX | XX | XX | XX |
  *		---------------------------------------------
  *
- *  carton :	carton qu'on souhaite afficher
+ *  carton : carton qu'on souhaite afficher
  *
  *  return : void
  */
@@ -306,4 +320,19 @@ void affichageCarton(ST_Carton carton) {
 		printf("\n\t");
 	}
 	printf("\n");
+}
+
+/*
+ *	Function : void supprimerVariableDynamique(ST_Loto* loto)
+ *	----------------------------
+ *	Permet de supprimer les blocs mémoires alloués dynamiquement
+ *  afin d'éviter les fuites mémoires
+ *
+ *  carton : jeu loto dans lequel on veut supprimer les bloc mémoires alloués dynamiquement
+ *
+ *  return : void
+ */
+void supprimerVariableDynamique(ST_Loto* loto) {
+	free(loto->TbCartons);
+	free(loto->TbCartonsGagnants);
 }

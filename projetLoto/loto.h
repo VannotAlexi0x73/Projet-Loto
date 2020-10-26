@@ -16,7 +16,6 @@
 
 
 // ---------------- Define ---------------- 
-#define MAX_SIZE		1500
 #define LOTO_NB_MIN		1
 #define LOTO_NB_MAX		90
 #define NB_CASE			9
@@ -46,7 +45,7 @@ typedef struct {
 typedef struct {
 	ST_Carton* TbCartons;
 	ST_Numero TbNumeros[90];
-	int TbCartonsGagnants[MAX_SIZE];
+	int* TbCartonsGagnants;
 	int TypeJeu;					// TODO ?? => automatique
 	double DureeMarquage;
 } ST_Loto;
@@ -64,3 +63,4 @@ int lectureLigneFichier(FILE* file, int tab[]);
 void jouerLoto(ST_Loto* loto);
 bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep);
 void affichageCarton(ST_Carton carton);
+void supprimerVariableDynamique(ST_Loto* loto);

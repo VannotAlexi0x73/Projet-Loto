@@ -9,22 +9,20 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "loto.h"
-#include "loto.c"
 
 /*
  *	Function : int main(int argc, char* argv[])
  *	----------------------------
  *	L'exécution du programme commence et se termine à cet endroit.
  *
- *  argc :	le nombre de chaînes de caractères sur lequel pointe argv
+ *  argc	: le nombre de chaînes de caractères sur lequel pointe argv
  * 
- *	argv : pointeur sur les chaînes de caractères passées en console
+ *	argv	: pointeur sur les chaînes de caractères passées en console
  *
- *  return : 1 (EXIT_FAILURE) ou 0 (EXIT_SUCCESS)
+ *  return	: 1 (EXIT_FAILURE) ou 0 (EXIT_SUCCESS)
  */
 int main(int argc, char* argv[])
 {
-	// ---------------- Variable ----------------
 
 	// ---------------- Moteur de jeu ----------------
 	createLoto(&loto);

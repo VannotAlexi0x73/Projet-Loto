@@ -67,7 +67,7 @@ void createLoto(ST_Loto* loto) {
 			}
 		}
 
-		for (int i = 0; i < 90; i++)
+		for (int i = 0; i < LOTO_NB_MAX; i++)
 		{
 			loto->TbNumeros[i].bCrie = false;
 			loto->TbNumeros[i].NbOccurrenceAttend = 0;

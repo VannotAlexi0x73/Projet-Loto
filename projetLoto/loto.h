@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // Fichier		: loto.h											//
 // Sommaire		: Ensemble des structures / fonctions				//
-//                nécessaires à l'exécution du jeu loto	            //
+//                nï¿½cessaires ï¿½ l'exï¿½cution du jeu loto	            //
 // Date			: 25/10/2020										//
 // Version		: 1.0												//
 // Auteur		: VANNOT Alexis										//
@@ -44,7 +44,7 @@ typedef struct {
 } ST_Numero;
 
 typedef struct {
-	ST_Carton TbCartons[MAX_SIZE];
+	ST_Carton* TbCartons;
 	ST_Numero TbNumeros[90];
 	int TbCartonsGagnants[MAX_SIZE];
 	int TypeJeu;					// TODO ?? => automatique
@@ -55,6 +55,7 @@ typedef struct {
 
 // ---------------- Variable globale ---------------- 
 ST_Loto loto;
+int iNbCartons;
 
 
 // ---------------- Prototypes des fonctions ----------------

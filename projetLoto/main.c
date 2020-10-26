@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "loto.h"
+#include "loto.c"
 
 /*
  *	Function : int main(int argc, char* argv[])

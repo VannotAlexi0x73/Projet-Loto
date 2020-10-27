@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 // Fichier		: loto.c											//
-// Sommaire		: Contient toutes les fonctionnalit�s du jeu loto	//
+// Sommaire		: Contient toutes les fonctionnalités du jeu loto	//
 // Date			: 25/10/2020										//
 // Version		: 1.0												//
 // Auteur		: VANNOT Alexis										//
@@ -12,11 +12,11 @@
 /*
  *	Function : void createLoto(ST_Loto* loto)
  *	----------------------------
- *	Elle permet de cr�er toutes les donn�es n�cessaires
- *	au fonctionnement du jeu gr�ce au fichier DESCAR.txt
+ *	Elle permet de créer toutes les données nécessaires
+ *	au fonctionnement du jeu grâce au fichier DESCAR.txt
  *
- *  loto	: pointeur sur un �l�ment loto cr�� dans le main()
- *			  de fa�on � modifier son contenu
+ *  loto	: pointeur sur un élément loto crée en variable globale
+ *			  de façon à modifier son contenu
  *
  *  return	: void
  */
@@ -88,13 +88,13 @@ void createLoto(ST_Loto* loto) {
 /*
  *	Function : int lectureLigneFichier(FILE* file, int tab[])
  *	----------------------------
- *	Permet de r�cup�rer les donn�es en ligne dans le fichier sous le
+ *	Permet de récupérer les données en ligne dans le fichier sous le
  *	format "nCarton;x;x;x;x;x;x;x;x;x;x;x;x;x;x;x"
  *
  *  file	: pointeur sur le fichier dans lequel on va lire les valeurs
- *	tab		: tableau pour stocker les donn�es lues dans le fichier
+ *	tab		: tableau pour stocker les données lues dans le fichier
  *
- *  return	: valeur de retour de la m�thode fscanf(arg1, arg2)
+ *  return	: valeur de retour de la méthode fscanf(arg1, arg2)
  */
 int lectureLigneFichier(FILE* file, int tab[]) {
 	return fscanf(
@@ -110,9 +110,9 @@ int lectureLigneFichier(FILE* file, int tab[]) {
 /*
  *	Function : void jouerLoto(ST_Loto* loto)
  *	----------------------------
- *	Fonction qui permet � l'utilisateur de renseigner les num�ros qui ont �t� cri�s
+ *	Fonction qui permet à l'utilisateur de renseigner les numéros qui ont été cries
  *
- *  loto	: pointeur sur le jeu loto cr�� pr�c�dement afin de pouvoir
+ *  loto	: pointeur sur le jeu loto créé précédement afin de pouvoir
  *			  le transmettre au moteur de jeu pour en modifier son contenu
  *
  *  return	: void
@@ -138,10 +138,10 @@ void jouerLoto(ST_Loto* loto)
 
 		} while (bAgain && ((iNum < LOTO_NB_MIN) || (iNum > LOTO_NB_MAX)));
 
-		// On met -1 car les nombres du loto commencent � 1 et que le premier index d'un tableau est 0
+		// On met -1 car les nombres du loto commencent à 1 et que le premier index d'un tableau est 0
 		cartonGagnantNLignes(loto, iNum - 1, &iStep);
 
-	// On met iStep != 4 car incr�mentation lors de l'�tape 3 �galement
+	// On met iStep != 4 car incr�mentation lors de l'étape 3 �galement
 	} while (bAgain && (iStep != 4));
 
 	if (bAgain)
@@ -161,16 +161,16 @@ void jouerLoto(ST_Loto* loto)
 /*
  *	Function : bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
  *	----------------------------
- *	Moteur de jeu du loto en 3 �tapes :
+ *	Moteur de jeu du loto en 3 étapes :
  *	- 1re : 1 ligne d'un carton
  *	- 2e : 2 lignes d'un carton
  *	- 3e : 3 lignes d'un carton
- *	Lorsque une �tape est valid�e, la prochaine it�ration dans cette
- *	fonction serra l'�tape suivante gr�ce au pointeur iStep
+ *	Lorsque une étape est validée, la prochaine itération dans cette
+ *	fonction serra l'étape suivante grâce au pointeur iStep
  *
- *  loto	: pointeur sur le jeu loto cr�� pr�c�dement
- *	iNum	: num�ro qui vient d'�tre cri�
- *	iStep	: pointeur sur l'�tape de jeu du loto afin de modifier l'�tape
+ *  loto	: pointeur sur le jeu loto créé précédement
+ *	iNum	: numéro qui vient d'être crié
+ *	iStep	: pointeur sur l'étape de jeu du loto afin de modifier l'étape
  *
  *  return	: true si au moins un carton est gagnant sinon false
  */
@@ -198,7 +198,7 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 			for (int k = 0; k < NB_CASE; k++)
 			{
 				iCase = loto->TbCartons[i].TbLigne[j].TbCase[k];
-				// On met -1 car les nombres du loto commencent � 1 et que le premier index d'un tableau est 0
+				// On met -1 car les nombres du loto commencent à 1 et que le premier index d'un tableau est 0
 				if (iCase != 0 && loto->TbNumeros[iCase - 1].bCrie == true)
 				{
 					loto->TbCartons[i].TbLigne[j].Marqueur++;

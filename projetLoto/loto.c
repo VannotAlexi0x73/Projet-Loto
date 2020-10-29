@@ -27,15 +27,26 @@ void createLoto(ST_Loto* loto) {
 	FILE* file = fopen("DESCAR.txt", "r");
 	int tabLigneFichier[16];
 	ST_Carton* pCartons;
-	iNbCartons = 0;
 
+	if (file != NULL)
+	{
+		// Initialisations des variables
+		loto->NbCartonsGardes = 0;
+		loto->NbCartonsGagnants = 0;
+		loto->DureeMarquage = 0;
 
-	// ---------------- Lecture du fichier ---------------- 
-	if (file != NULL) {
+		for (int i = 0; i < LOTO_NB_MAX; i++)
+		{
+			loto->TbNumeros[i].bCrie = false;
+			loto->TbNumeros[i].NbOccurrenceAttend = 0;
+			loto->TbNumeros[i].NbOccurrenceMarque = 0;
+		}
+
+		// Lecture du fichier 
 		while (lectureLigneFichier(file, tabLigneFichier) != EOF)
 		{
-			iNbCartons++;
-			pCartons = realloc(loto->TbCartons, sizeof(ST_Carton) * iNbCartons);
+			loto->NbCartonsGardes++;
+			pCartons = realloc(loto->TbCartons, sizeof(ST_Carton) * loto->NbCartonsGardes);
 
 			// Sécurité en cas de soucis allocation dynamique
 			if (pCartons != NULL)
@@ -50,38 +61,27 @@ void createLoto(ST_Loto* loto) {
 				exit(EXIT_FAILURE);
 			}
 			
-			loto->TbCartons[iNbCartons - 1].NumeroCarton = tabLigneFichier[0];
+			loto->TbCartons[loto->NbCartonsGardes - 1].NumeroCarton = tabLigneFichier[0];
 
 			for (int i = 0; i < NB_LIGNE; i++)
 			{
+				loto->TbCartons[loto->NbCartonsGardes - 1].TbLigne[i].Marqueur = 0;
 				for (int k = 0; k < NB_CASE; k++)
 				{
-					loto->TbCartons[iNbCartons - 1].TbLigne[i].TbCase[k] = 0;
+					loto->TbCartons[loto->NbCartonsGardes - 1].TbLigne[i].TbCase[k] = 0;
 				}
 				for (int j = (NB_ELEM_LIGNE * i) + 1; j < (NB_ELEM_LIGNE * (i + 1)) + 1 ; j++)
 				{
-
-					loto->TbCartons[iNbCartons - 1].TbLigne[i].TbCase[tabLigneFichier[j] / 10] = tabLigneFichier[j];
+					loto->TbCartons[loto->NbCartonsGardes - 1].TbLigne[i].TbCase[tabLigneFichier[j] / 10] = tabLigneFichier[j];
 				}
-				loto->TbCartons[iNbCartons - 1].TbLigne[i].Marqueur = 0;
 			}
 		}
-
-		for (int i = 0; i < LOTO_NB_MAX; i++)
-		{
-			loto->TbNumeros[i].bCrie = false;
-			loto->TbNumeros[i].NbOccurrenceAttend = 0;
-			loto->TbNumeros[i].NbOccurrenceMarque = 0;
-		}
-
-		loto->DureeMarquage = 0;
-		loto->TypeJeu = 0;
-
 		fclose(file);
 	}
 	else
 	{
 		printf("Une erreur est survenue lors de la lecture du fichier.\n");
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -139,19 +139,14 @@ void jouerLoto(ST_Loto* loto)
 		} while (bAgain && ((iNum < LOTO_NB_MIN) || (iNum > LOTO_NB_MAX)));
 
 		// On met -1 car les nombres du loto commencent à 1 et que le premier index d'un tableau est 0
-		cartonGagnantNLignes(loto, iNum - 1, &iStep);
+		if (bAgain) cartonGagnantNLignes(loto, iNum - 1, &iStep);
 
-	// On met iStep != 4 car incr�mentation lors de l'étape 3 �galement
+	// On met iStep != 4 car incrémentation lors de l'étape 3 également
 	} while (bAgain && (iStep != 4));
 
-	if (bAgain)
-	{
-		printf("\n\t==> Le jeu est termine, il y a au moins un carton plein.\n");
-	}
-	else
-	{
+	bAgain ? 
+		printf("\n\t==> Le jeu est termine, il y a au moins un carton plein.\n") :
 		printf("\n\t==> Vous avez decide d'arreter le loto avant sa fin.\n");
-	}
 
 	// Libération de l'espace mémoire allouée dynamiquement
 	supprimerVariableDynamique(loto);
@@ -174,23 +169,27 @@ void jouerLoto(ST_Loto* loto)
  *
  *  return	: true si au moins un carton est gagnant sinon false
  */
-bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
+void cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 {
 
 	// ---------------- Variables ----------------
-	int nbCountLigneGagnante = 0;
 	int iSommeMarqueur = 0;
 	int iCase = 0;
 	int iTmp = 0;
 	int* pGagnants;
-	clock_t cDebut = clock();
+	LARGE_INTEGER start, end;
+
+	// Mesure de la performance d'un marquage
+	QueryPerformanceCounter(&start);
 
 	// ---------------- Boucles de jeu ----------------
 	loto->TbNumeros[iNum].bCrie = true;
+	loto->NbCartonsGagnants = 0;
 
-	for (int i = 0; i < iNbCartons; i++)
+	for (int i = 0; i < loto->NbCartonsGardes; i++)
 	{
 		iSommeMarqueur = 0;
+
 		for (int j = 0; j < NB_LIGNE; j++)
 		{
 			loto->TbCartons[i].TbLigne[j].Marqueur = 0;
@@ -202,6 +201,7 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 				if (iCase != 0 && loto->TbNumeros[iCase - 1].bCrie == true)
 				{
 					loto->TbCartons[i].TbLigne[j].Marqueur++;
+					loto->TbNumeros[iCase - 1].NbOccurrenceMarque++;
 				}
 			}
 			if (loto->TbCartons[i].TbLigne[j].Marqueur == 5) iSommeMarqueur += 5;
@@ -209,9 +209,9 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 		// On met -1 car le premier carton est 1 et que le premier index d'un tableau est 0
 		if (iSommeMarqueur == (5 * (*iStep)))
 		{
-			nbCountLigneGagnante++;
+			loto->NbCartonsGagnants++;
 
-			pGagnants = realloc(loto->TbCartonsGagnants, sizeof(int) * nbCountLigneGagnante);
+			pGagnants = realloc(loto->TbCartonsGagnants, sizeof(int) * loto->NbCartonsGagnants);
 
 			// Sécurité en cas de soucis allocation dynamique
 			if (pGagnants != NULL)
@@ -226,28 +226,29 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 				exit(EXIT_FAILURE);
 			}
 
-			loto->TbCartonsGagnants[nbCountLigneGagnante - 1] = loto->TbCartons[i].NumeroCarton - 1;
+			loto->TbCartonsGagnants[loto->NbCartonsGagnants - 1] = loto->TbCartons[i].NumeroCarton - 1;
 		}
 	}
 
-	cDebut = clock() - cDebut;
-	loto->DureeMarquage = ((double) cDebut) / ((double) CLOCKS_PER_SEC);
+	// Mesure de la performance d'un marquage
+	QueryPerformanceCounter(&end);
+	loto->DureeMarquage = (1000.0 * (end.QuadPart - start.QuadPart)) / 10000000.0; // Conversion en millsecondes
 
 #ifdef PERFORMANCE
 	printf("> Marquage effectue en %f s.\n", loto->DureeMarquage);
 #endif // PERFORMANCE
 
 
-	if (nbCountLigneGagnante)
+	if (loto->NbCartonsGagnants)
 	{
 		printf("\tLe(s) carton(s) gagnant(s) est/sont :\n");
-		for (int i = 0; i < nbCountLigneGagnante; i++)
+		for (int i = 0; i < loto->NbCartonsGagnants; i++)
 		{
 			iTmp = loto->TbCartonsGagnants[i];
 			affichageCarton(loto->TbCartons[iTmp]);
 		}
 
-		// On incr�mente l'�tape du loto pour passer � plusieurs lignes gagnantes
+		// On incrémente l'étape du loto pour passer à plusieurs lignes gagnantes
 		(*iStep)++;
 		
 		if ((*iStep) == 2)
@@ -257,11 +258,6 @@ bool cartonGagnantNLignes(ST_Loto* loto, int iNum, int* iStep)
 		else if ((*iStep) == 3) {
 			printf("\n\tVous jouez maintenant pour carton plein.\n\n");
 		}
-		return true;
-	}
-	else
-	{
-		return false;
 	}
 }
 

@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
 {
 
 	// ---------------- Moteur de jeu ----------------
+
 	createLoto(&loto);
 	jouerLoto(&loto);
 
